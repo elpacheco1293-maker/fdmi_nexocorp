@@ -1,69 +1,101 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Generador ZIP Transfer Orders</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>NEXOCORP-FDMI · Transfer Orders</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="icon" href="logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f6f7f9;--card:#fff;--tx:#1d2330;--mu:#667085;--bd:#dfe3ea;--ac:#0b6e4f;--er:#b42318;--wa:#b54708;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171c;--card:#1d2128;--tx:#e8eaee;--mu:#98a2b3;--bd:#2c323c;--ac:#34c38f;--er:#f97066;--wa:#fdb022;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#14171c;--card:#1d2128;--tx:#e8eaee;--mu:#98a2b3;--bd:#2c323c;--ac:#34c38f;--er:#f97066;--wa:#fdb022;color-scheme:dark}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:1100px;margin:auto}
-h1{font-size:20px;margin:0 0 2px}p.s{color:var(--mu);margin:0 0 14px}
-.c{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}.c h2{font-size:14px;margin:0 0 10px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-label{display:block;font-size:12px;color:var(--mu)}input,select,textarea{width:100%;padding:7px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
-textarea{font-family:ui-monospace,Menlo,monospace;font-size:12px}
-button{padding:8px 14px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--tx);font:inherit;cursor:pointer}button.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}button:disabled{opacity:.45;cursor:not-allowed}
+:root{--bg:#07051a;--card:#100c2c;--tx:#e9e7ff;--mu:#9a95c9;--bd:#2b2466;--ac:#6c5bff;--ac2:#b19dff;--er:#ff6b7a;--wa:#ffb84d;--ok:#4fe3b0;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 400px at 85% -10%,#2a1c8c55,transparent),var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:1100px;margin:auto}
+header{display:flex;gap:14px;align-items:center;margin-bottom:16px}.logo{height:64px;width:auto;border-radius:12px;box-shadow:0 0 0 1px var(--ac),0 0 24px #6c5bff88}
+h1{font:700 20px Orbitron,system-ui,sans-serif;letter-spacing:.12em;margin:0;background:linear-gradient(90deg,#fff,var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}.s{color:var(--mu);margin:2px 0 0}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 0 18px #6c5bff14}.c h2{font:500 13px Orbitron,system-ui,sans-serif;letter-spacing:.1em;color:var(--ac2);margin:0 0 10px;text-transform:uppercase}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}label{display:block;font-size:12px;color:var(--mu)}
+input,select,textarea{width:100%;padding:7px 8px;border:1px solid var(--bd);border-radius:6px;background:#0a0724;color:var(--tx);font:inherit}input:focus,textarea:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 2px #6c5bff44}
+textarea{font-family:ui-monospace,Menlo,monospace;font-size:12px}input[type=checkbox]{width:auto}
+button,.fb{padding:8px 14px;border:1px solid var(--bd);border-radius:6px;background:#17123d;color:var(--tx);font:inherit;cursor:pointer;display:inline-block}button:hover,.fb:hover{border-color:var(--ac)}
+button.p{background:linear-gradient(90deg,#5b4bff,#8a6bff);border-color:transparent;color:#fff;font-weight:600}button:disabled{opacity:.4;cursor:not-allowed}
 .w{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:640px}th,td{padding:4px;text-align:left;border-bottom:1px solid var(--bd)}th{font-size:12px;color:var(--mu)}td input{padding:5px 6px}
-.r{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:10px}.bad{border-color:var(--er)!important}.unk{border-color:var(--wa)!important}
-.m{font-size:12px;margin-top:6px}.m.e{color:var(--er)}.m.w{color:var(--wa)}pre{margin:0;max-height:220px;overflow:auto;font-size:11px;white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:8px;border-radius:6px}
+.r{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.m{font-size:12px;margin-top:6px}.e{color:var(--er)}.wn{color:var(--wa)}.ok{color:var(--ok)}
+pre{margin:0;max-height:220px;overflow:auto;font-size:11px;white-space:pre-wrap;word-break:break-all;background:#0a0724;padding:8px;border-radius:6px}
 </style></head><body>
-<h1>Generador ZIP · Transfer Orders (ERP)</h1><p class="s">Carga los ítems, revisa y descarga el ZIP con los 2 CSV listos para Oracle.</p>
+<header><img class="logo" src="logo.jpg" alt="NEXOCORP-FDMI"><div><h1>NEXOCORP-FDMI</h1><p class="s">Generador de Transfer Orders · ZIP listo para el ERP</p></div></header>
 <div class="c"><h2>Parámetros</h2><div class="g" id="cfg"></div></div>
 <div class="c"><h2>Líneas</h2>
-<div class="g" style="grid-template-columns:2fr 1fr 1fr 2fr auto;align-items:end"><div><label>Item number (escanea o escribe, Enter)</label><input id="qi" autocomplete="off"></div><div><label>Cantidad</label><input id="qq" type="number" min="1" value="1"></div><div><label>UM</label><input id="qu" maxlength="3"></div><div><label>Motivo</label><input id="qm" list="mot"></div><button class="p" id="qa">Agregar</button></div>
+<div class="g" style="align-items:end"><div><label>Motivo por defecto</label><input id="dm" list="mot" value="REVERSION"></div><label style="display:flex;gap:6px;align-items:center;padding-bottom:8px"><input type="checkbox" id="sm" checked> Sumar repetidos</label></div>
 <datalist id="mot"><option>REVERSION</option><option>REVERSION MAL ESTADO</option></datalist>
-<details style="margin-top:10px"><summary>Pegar desde Excel (item, cantidad, UM, motivo — separado por tab o coma)</summary><textarea id="pa" rows="4"></textarea><div class="r"><button id="pb">Agregar pegado</button></div></details>
-<div class="w" style="margin-top:10px"><table><thead><tr><th>#</th><th>Item number</th><th>Cant.</th><th>UM</th><th>Motivo</th><th></th></tr></thead><tbody id="tb"></tbody></table></div><div id="msg"></div></div>
-<div class="c"><h2>Catálogo de ítems <span id="cn" style="color:var(--mu);font-weight:400"></span></h2><p class="s" style="margin:0 0 8px">Sirve para autocompletar la UM y avisar si un item no existe. Partió con los ítems de tu Excel y tu ZIP.</p>
+<label style="margin-top:10px">Pega aquí tus datos (o usa Ctrl+V en cualquier parte). Reconoce con o sin encabezado: solo items, item+cantidad, o item+cantidad+UM+motivo</label>
+<textarea id="pa" rows="4" placeholder="8809733213716&#9;2&#10;3510436&#9;1&#9;UNI&#9;REVERSION MAL ESTADO"></textarea>
+<div class="r"><button class="p" id="pb">Reconocer y agregar</button><label class="fb">Subir Excel / CSV<input id="fi" type="file" accept=".xlsx,.xls,.csv,.txt" hidden></label><button id="ar">+ Fila manual</button><button id="vc">Vaciar</button></div><div id="ps" class="m"></div>
+<div class="g" style="grid-template-columns:2fr 1fr 1fr auto;align-items:end;margin-top:10px"><div><label>Escaneo rápido: item (Enter agrega)</label><input id="qi" autocomplete="off"></div><div><label>Cantidad</label><input id="qq" type="number" min="1" value="1"></div><div><label>UM</label><input id="qu" maxlength="3"></div><button id="qa">Agregar</button></div>
+<div class="w" style="margin-top:10px"><table><thead><tr><th>#</th><th>Item number</th><th>Cant.</th><th>UM</th><th>Bodega</th><th>Motivo</th><th></th></tr></thead><tbody id="tb"></tbody></table></div><div id="msg"></div></div>
+<div class="c"><h2>Catálogo de ítems <span id="cn" style="color:var(--mu)"></span></h2><p class="s" style="margin:0 0 8px">Autocompleta la UM y avisa si un item es nuevo. También aprende de lo que pegas cuando trae UM.</p>
 <details><summary>Agregar más (una línea por item: item, UM)</summary><textarea id="ci" rows="4"></textarea><div class="r"><button id="cb">Agregar al catálogo</button><button id="cr">Restaurar inicial</button></div></details></div>
-<div class="c"><h2>Resultado</h2><div class="r" style="margin:0 0 10px"><button class="p" id="dl">Descargar ZIP</button><span id="dm" class="m"></span></div><label>DosSupplyLinesInt.csv</label><pre id="pv"></pre></div>
+<div class="c"><h2>Resultado</h2><p class="s" style="margin:0 0 8px">El ZIP acumula todas las líneas con su propia bodega destino: al cambiar la bodega en Parámetros, lo anterior se conserva.</p><div class="g" style="align-items:end"><div><label>Nombre del ZIP</label><select id="nm"><option value="corr">Automático: prefijo + fecha + correlativo</option><option value="man">Nombre manual</option></select></div><div><label>Prefijo / Nombre</label><input id="np"><input id="nn" placeholder="nombre.zip"></div></div><div class="r"><button class="p" id="dl">Descargar ZIP</button><span class="m">Se guardará como: <b id="fn"></b></span><span id="dt" class="m"></span></div><label>DosSupplyLinesInt.csv</label><pre id="pv"></pre></div>
 <script>
 var SEED={"6949625700145":"UNI","106311":"UNI","8030082002168":"FCO","8431166270020":"FCO","8431166180015":"CAJ","8030082002243":"TBO","431166180053":"FCO","8431166181388":"FCO","8429420105935":"FCO","8429420188020":"UNI","3600542528122":"FCO","3600541894327":"UNI","3661434002960":"FCO","3661434000515":"FCO","3661434005732":"UNI","3661434007910":"FCO","3661434008610":"UNI","8423372026010":"FCO","8423372000331":"FCO","7703281020356":"UNI","7770105008890":"UNI","7770105009613":"UNI","7770108750420":"FCO","7770105009637":"UNI","7770105008937":"UNI","7770108750437":"UNI","7770108750413":"UNI","7770108751380":"UNI","7770105008906":"UNI","7750215025659":"UNI","3661434003004":"TBO","3661434000973":"UNI","8423372840210":"UNI","3760269770386":"UNI","3760269770560":"UNI","3760269770539":"UNI","7703281020349":"TBO","3760269770942":"UNI","8423372800153":"UNI","3661434011931":"UNI","3661434009525":"UNI","7703281020363":"UNI","7703281002062":"TBO","1060771":"UNI","814179021229":"UNI","814179021250":"UNI","709507":"UNI","709546":"UNI","709825":"UNI","709817":"UNI","709568":"UNI","709682":"UNI","709781":"UNI","8809733213716":"UNI","7509546054650":"TBO","3510436":"BLS","7804920230225":"UNI"};
-var F=[["fecha","Fecha","date"],["dest","Bodega destino"],["org","Bodega origen"],["prep","Preparador"],["mail","Email preparador"],["sd","Subinv. destino"],["so","Subinv. origen"],["hora","Hora need-by"],["nota","Nota (ATTR8)"],["tipo","Tipo (ATTR6)"]];
-var D={fecha:new Date().toISOString().slice(0,10),dest:"B339",org:"B300",prep:"CRUZ ALVARO",mail:"afcruz@farmacorp.com",sd:"ACTIVO",so:"ACTIVO",hora:"03:00:00",nota:"VENTA SEGURA",tipo:"OTROS"};
-var cfg=Object.assign({},D),cat=Object.assign({},SEED),rows=[];
+var F=[["fecha","Fecha","date"],["dest","Bodega destino (líneas nuevas)"],["org","Bodega origen"],["prep","Preparador"],["mail","Email preparador"],["sd","Subinv. destino"],["so","Subinv. origen"],["hora","Hora need-by"],["nota","Nota (ATTR8)"],["tipo","Tipo (ATTR6)"]];
+var D={fecha:ymd("-"),dest:"B339",org:"B300",prep:"CRUZ ALVARO",mail:"afcruz@farmacorp.com",sd:"ACTIVO",so:"ACTIVO",hora:"03:00:00",nota:"VENTA SEGURA",tipo:"OTROS",pref:"fdminexocorp",nmode:"corr",nman:""};
+function ymd(s){var d=new Date(),p=function(n){return(n<10?"0":"")+n};return d.getFullYear()+s+p(d.getMonth()+1)+s+p(d.getDate())}
 function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-cfg=Object.assign(cfg,ld("to_cfg",{}),{fecha:D.fecha});cat=ld("to_cat",cat);rows=ld("to_rows",[]);
+var cfg=Object.assign({},D,ld("to_cfg",{}),{fecha:D.fecha}),cat=ld("to_cat",Object.assign({},SEED)),rows=ld("to_rows",[]);
+rows.forEach(function(r){if(!r.dest)r.dest=cfg.dest});
 var $=function(i){return document.getElementById(i)};
 $("cfg").innerHTML=F.map(function(f){return '<div><label>'+f[1]+'</label><input data-k="'+f[0]+'" type="'+(f[2]||"text")+'"></div>'}).join("");
 document.querySelectorAll("[data-k]").forEach(function(e){e.value=cfg[e.dataset.k];e.oninput=function(){cfg[e.dataset.k]=e.value;sv("to_cfg",cfg);out()}});
 function esc(s){return String(s).replace(/"/g,"&quot;")}
 function save(){sv("to_rows",rows);sv("to_cat",cat)}
-function draw(){$("tb").innerHTML=rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><input data-i="'+i+'" data-f="item" value="'+esc(r.item)+'"></td><td><input data-i="'+i+'" data-f="qty" type="number" style="width:80px" value="'+esc(r.qty)+'"></td><td><input data-i="'+i+'" data-f="uom" maxlength="3" style="width:64px" value="'+esc(r.uom)+'"></td><td><input data-i="'+i+'" data-f="mot" list="mot" value="'+esc(r.mot)+'"></td><td><button data-x="'+i+'">✕</button></td></tr>'}).join("");
+function draw(){$("tb").innerHTML=rows.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td><input data-i="'+i+'" data-f="item" value="'+esc(r.item)+'"></td><td><input data-i="'+i+'" data-f="qty" type="number" style="width:80px" value="'+esc(r.qty)+'"></td><td><input data-i="'+i+'" data-f="uom" maxlength="3" style="width:64px" value="'+esc(r.uom)+'"></td><td><input data-i="'+i+'" data-f="dest" style="width:84px" value="'+esc(r.dest)+'"></td><td><input data-i="'+i+'" data-f="mot" list="mot" value="'+esc(r.mot)+'"></td><td><button data-x="'+i+'">✕</button></td></tr>'}).join("");
  document.querySelectorAll("#tb [data-f]").forEach(function(e){e.oninput=function(){var r=rows[e.dataset.i];r[e.dataset.f]=e.value;if(e.dataset.f=="item"&&cat[e.value]){r.uom=cat[e.value];draw();return}save();out()}});
  document.querySelectorAll("[data-x]").forEach(function(b){b.onclick=function(){rows.splice(b.dataset.x,1);save();draw()}});
  $("cn").textContent="("+Object.keys(cat).length+")";out()}
-function add(item,qty,uom,mot){item=String(item||"").trim();if(!item)return;rows.push({item:item,qty:qty||1,uom:(uom||cat[item]||"").toUpperCase(),mot:(mot||"").toUpperCase()||"REVERSION"});save();draw()}
+function addMany(list){var st={n:0,m:0,nu:0,uk:0,l:0};
+ list.forEach(function(o){var item=String(o.item||"").trim();if(!item)return;var q=parseFloat(String(o.qty||"").replace(",","."));if(!(q>0))q=1;var u=String(o.uom||"").trim().toUpperCase(),known=!!cat[item];
+  if(u&&!known){cat[item]=u;st.l++}if(!u)u=cat[item]||"";if(!u)st.nu++;if(!known&&!o.uom)st.uk++;
+  var mo=String(o.mot||$("dm").value||"REVERSION").trim().toUpperCase(),ex=$("sm").checked&&rows.filter(function(r){return r.item==item&&r.uom==u&&r.mot==mo&&r.dest==cfg.dest})[0];
+  if(ex){ex.qty=+ex.qty+q;st.m++}else{rows.push({item:item,qty:q,uom:u,mot:mo,dest:cfg.dest});st.n++}});
+ save();draw();var h="Reconocidas: "+st.n+" nuevas"+(st.m?", "+st.m+" sumadas a existentes":"")+(st.l?", "+st.l+" ítems aprendidos al catálogo":"")+".";
+ $("ps").className="m "+(st.nu||st.uk?"wn":"ok");$("ps").textContent=h+(st.nu?" "+st.nu+" sin UM: complétalas en la tabla.":"")+(st.uk&&!st.nu?"":"")}
+function parse(t){var ls=t.split(/\r?\n/).filter(function(l){return l.trim()});if(!ls.length)return[];
+ var dl=ls[0].indexOf("\t")>=0?"\t":ls[0].indexOf(";")>=0?";":ls[0].indexOf(",")>=0?",":null,ums={};Object.keys(cat).forEach(function(k){ums[cat[k]]=1});
+ var rs=ls.map(function(l){return(dl?l.split(dl):l.trim().split(/\s+/)).map(function(x){return x.trim().replace(/^"|"$/g,"")})}),map=null,h=rs[0].map(function(x){return x.toLowerCase()});
+ if(h.some(function(x){return/^(item|sku|cod|ean|barr|cant|qty|um$|uom|unid|motivo)/.test(x)})){map={};h.forEach(function(x,i){if(/item|sku|cod|ean|barr/.test(x))map.item=i;else if(/cant|qty/.test(x))map.qty=i;else if(/^(um|uom|unid)/.test(x))map.uom=i;else if(/motivo|razon|tipo/.test(x))map.mot=i});rs.shift()}
+ return rs.map(function(p){var o={};if(map&&map.item!=null){o={item:p[map.item],qty:p[map.qty],uom:p[map.uom],mot:p[map.mot]}}else{o.item=p[0];for(var i=1;i<p.length;i++){var v=p[i];if(!v)continue;
+  if(/^\d+([.,]\d+)?$/.test(v)){if(o.qty==null)o.qty=v;else o.mot=(o.mot?o.mot+" ":"")+v}else if(/^[A-Za-z]{2,3}$/.test(v)&&!o.uom&&(dl||ums[v.toUpperCase()]))o.uom=v;else o.mot=(o.mot?o.mot+" ":"")+v}}return o}).filter(function(o){return o.item})}
+function ingest(t){var l=parse(t);if(!l.length){$("ps").className="m e";$("ps").textContent="No encontré datos para reconocer.";return}addMany(l)}
+$("pb").onclick=function(){ingest($("pa").value);$("pa").value=""};
+document.addEventListener("paste",function(e){var t=e.target.tagName;if(t=="INPUT"||t=="TEXTAREA")return;var x=(e.clipboardData||window.clipboardData).getData("text");if(x){e.preventDefault();ingest(x)}});
+$("fi").onchange=function(){var f=this.files[0];if(!f)return;var rd=new FileReader(),x=/\.xlsx?$/i.test(f.name);rd.onload=function(){var t;if(x){var wb=XLSX.read(rd.result,{type:"array"});t=XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]],{FS:"\t",blankrows:false})}else t=rd.result;ingest(t)};x?rd.readAsArrayBuffer(f):rd.readAsText(f);this.value=""};
+$("ar").onclick=function(){rows.push({item:"",qty:1,uom:"",dest:cfg.dest,mot:($("dm").value||"REVERSION").toUpperCase()});save();draw()};
+$("vc").onclick=function(){if(!rows.length||confirm("¿Vaciar todas las líneas?")){rows=[];save();draw()}};
 $("qi").oninput=function(){$("qu").value=cat[$("qi").value.trim()]||$("qu").value};
-function qa(){add($("qi").value,+$("qq").value,$("qu").value,$("qm").value);$("qi").value="";$("qu").value="";$("qq").value=1;$("qi").focus()}
+function qa(){addMany([{item:$("qi").value,qty:$("qq").value,uom:$("qu").value}]);$("qi").value="";$("qu").value="";$("qq").value=1;$("qi").focus()}
 $("qa").onclick=qa;$("qi").onkeydown=function(e){if(e.key=="Enter")qa()};
-$("pb").onclick=function(){$("pa").value.split(/\r?\n/).forEach(function(l){var p=l.split(/\t|,|;/).map(function(x){return x.trim()});if(p[0])add(p[0],+p[1]||1,p[2],p[3])});$("pa").value=""};
 $("cb").onclick=function(){$("ci").value.split(/\r?\n/).forEach(function(l){var p=l.split(/\t|,|;/).map(function(x){return x.trim()});if(p[0]&&p[1])cat[p[0]]=p[1].toUpperCase()});$("ci").value="";save();draw()};
 $("cr").onclick=function(){cat=Object.assign({},SEED);save();draw()};
-function build(){var d=cfg.fecha.split("-"),dd=d[2]+"."+d[1]+"."+d[0].slice(2),nb=d[0]+"/"+d[1]+"/"+d[2]+" "+cfg.hora,errs=[],warn=[];
- var mots=[];rows.forEach(function(r){if(mots.indexOf(r.mot)<0)mots.push(r.mot)});
- var s=rows.map(function(r,i){return{r:r,i:i,o:mots.indexOf(r.mot)}}).sort(function(a,b){return a.o-b.o||a.i-b.i});
- var lines=s.map(function(x,n){var r=x.r,b=dd+cfg.dest+"."+r.mot;n++;
-  if(!r.item)errs.push("Fila "+(x.i+1)+": falta item");if(!(+r.qty>0))errs.push("Fila "+(x.i+1)+": cantidad inválida");if(!r.uom||r.uom.length>3)errs.push("Fila "+(x.i+1)+": UM inválida");if(b.length>50)errs.push("Nombre de lote supera 50 caracteres: "+b);
-  if(r.item&&!cat[r.item])warn.push("Fila "+(x.i+1)+": item "+r.item+" no está en el catálogo");
-  var f=new Array(67).fill("");var set={1:b,2:n,3:"CREATE",4:b,5:n,6:"TRANSFER",7:r.item,8:r.qty,9:r.uom,11:"INVENTORY",12:cfg.dest,13:cfg.org,15:cfg.sd,16:cfg.so,17:nb,18:cfg.prep,24:cfg.mail,31:cfg.tipo,32:r.mot,33:cfg.nota,67:"END"};
+function build(){var d=cfg.fecha.split("-"),dd=d[2]+"."+d[1]+"."+d[0].slice(2),nb=d[0]+"/"+d[1]+"/"+d[2]+" "+cfg.hora,errs=[],warn=[],mots=[];
+ rows.forEach(function(r){var k=r.dest+"|"+r.mot;if(mots.indexOf(k)<0)mots.push(k)});
+ var s=rows.map(function(r,i){return{r:r,i:i,o:mots.indexOf(r.dest+"|"+r.mot)}}).sort(function(a,b){return a.o-b.o||a.i-b.i});
+ var lines=s.map(function(x,n){var r=x.r,b=dd+r.dest+"."+r.mot,p="Fila "+(x.i+1)+": ";n++;
+  if(!r.item)errs.push(p+"falta item");if(!r.dest)errs.push(p+"falta bodega destino");if(/e\+/i.test(r.item))errs.push(p+"item en notación científica ("+r.item+")");if(!(+r.qty>0))errs.push(p+"cantidad inválida");if(!r.uom||r.uom.length>3)errs.push(p+"UM inválida");if(b.length>50)errs.push("Nombre de lote supera 50 caracteres: "+b);
+  if(r.item&&!cat[r.item])warn.push(p+"item "+r.item+" no está en el catálogo");
+  var f=new Array(67).fill(""),set={1:b,2:n,3:"CREATE",4:b,5:n,6:"TRANSFER",7:r.item,8:r.qty,9:r.uom,11:"INVENTORY",12:r.dest,13:cfg.org,15:cfg.sd,16:cfg.so,17:nb,18:cfg.prep,24:cfg.mail,31:cfg.tipo,32:r.mot,33:cfg.nota,67:"END"};
   for(var k in set)f[k-1]=set[k];return f.join(",")});
  return{csv:lines.length?lines.join("\r\n")+"\r\n":"",errs:errs,warn:warn}}
-function out(){var b=build();$("pv").textContent=b.csv||"(sin líneas)";
- var h="";if(b.errs.length)h+='<div class="m e">'+b.errs.slice(0,8).join("<br>")+"</div>";if(b.warn.length)h+='<div class="m w">'+b.warn.slice(0,8).join("<br>")+(b.warn.length>8?"<br>…y "+(b.warn.length-8)+" más":"")+"</div>";$("msg").innerHTML=h;
- $("dl").disabled=!rows.length||b.errs.length>0;$("dm").textContent=rows.length+" líneas"}
+function out(){var b=build();$("pv").textContent=b.csv||"(sin líneas)";var h="";
+ if(b.errs.length)h+='<div class="m e">'+b.errs.slice(0,8).join("<br>")+(b.errs.length>8?"<br>…y "+(b.errs.length-8)+" más":"")+"</div>";
+ if(b.warn.length)h+='<div class="m wn">'+b.warn.slice(0,8).join("<br>")+(b.warn.length>8?"<br>…y "+(b.warn.length-8)+" más":"")+"</div>";
+ $("msg").innerHTML=h;$("dl").disabled=!rows.length||b.errs.length>0;var c={};rows.forEach(function(r){c[r.dest]=(c[r.dest]||0)+1});$("dt").textContent=rows.length+" líneas · "+Object.keys(c).map(function(k){return k+": "+c[k]}).join(", ");pf()}
 $("dl").onclick=async function(){var b=build();if(b.errs.length)return;var z=new JSZip();z.file("DosDistributionDetailsInt.csv","\r\n");z.file("DosSupplyLinesInt.csv",b.csv);
- var blob=await z.generateAsync({type:"blob"});var dm=await claude.use("downloads");if(!dm){$("dm").textContent="Descarga no disponible en esta vista";return}
- try{await dm.save({filename:cfg.dest+".zip",data:blob});$("dm").textContent="ZIP listo ✔"}catch(e){$("dm").textContent=e&&e.code=="declined"?"Descarga cancelada":"No se pudo guardar ("+(e&&e.code||"error")+")"}};
+ var blob=await z.generateAsync({type:"blob"}),fn=fname(),dm=null;try{if(window.claude&&claude.use)dm=await claude.use("downloads")}catch(e){}
+ if(dm){try{await dm.save({filename:fn,data:blob});bump();$("dt").textContent="ZIP listo ✔"}catch(e){$("dt").textContent=e&&e.code=="declined"?"Descarga cancelada":"No se pudo guardar"}return}
+ var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();bump();$("dt").textContent="ZIP listo ✔"};
+function cnt(){var c=ld("to_cnt",{}),t=ymd("");return{t:t,n:(c.d==t?c.n:0)+1}}
+function man(){return cfg.nmode=="man"&&(cfg.nman||"").trim()}
+function fname(){if(man())return cfg.nman.trim().replace(/\.zip$/i,"")+".zip";var c=cnt();return(cfg.pref||"fdminexocorp")+"_"+c.t+"_"+(c.n<10?"0":"")+c.n+".zip"}
+function pf(){$("fn").textContent=fname();var m=cfg.nmode=="man";$("nn").style.display=m?"":"none";$("np").style.display=m?"none":""}
+function bump(){if(!man()){var c=cnt();sv("to_cnt",{d:c.t,n:c.n})}pf()}
+$("nm").value=cfg.nmode;$("np").value=cfg.pref;$("nn").value=cfg.nman;
+$("nm").onchange=function(){cfg.nmode=this.value;sv("to_cfg",cfg);pf()};$("np").oninput=function(){cfg.pref=this.value;sv("to_cfg",cfg);pf()};$("nn").oninput=function(){cfg.nman=this.value;sv("to_cfg",cfg);pf()};
 draw();
 </script></body></html>
